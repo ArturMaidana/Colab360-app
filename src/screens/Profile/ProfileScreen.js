@@ -1,0 +1,322 @@
+import React, { useState, useEffect, useContext } from 'react';
+import {
+  View,
+  StyleSheet,
+  Text,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+
+import CredentialModal from '../../components/Moldals/CredentialModal';
+import TermsOfUseModal from '../../components/Moldals/TermsOfUseModal';
+import NotesUpdates from '../../components/Moldals/NotesUpdates';
+import LogoutModal from '../../components/Moldals/LogoutModal';
+import HelpModal from '../../components/Moldals/HelpModal';
+import { ms } from 'react-native-size-matters';
+
+import { UserContext } from '../../contexts/UserContext';
+
+import {
+  ShieldCheckIcon,
+  HelpIcon,
+  QrCodeIcon,
+  CheckBadgeIcon,
+  LogoutIcon,
+  ArrowRightFilledIcon,
+  BellIcon,
+} from '../../components/Icons/Icons';
+
+import CustomSwitch from '../../components/ui/CustomSwitch';
+
+const ProfileRow = ({
+  iconName,
+  text,
+  type = 'navigate',
+  isDestructive = false,
+  switchValue,
+  onSwitchChange,
+  onPress,
+}) => {
+  const textColor = isDestructive ? '#D9534F' : '#333';
+
+  const renderIcon = () => {
+    const props = { width: 22, height: 22 };
+    switch (iconName) {
+      case 'shield':
+        return <ShieldCheckIcon {...props} />;
+      case 'activity':
+        return <AcessIcon {...props} />;
+      case 'grid':
+        return <QrCodeIcon {...props} />;
+      case 'refresh-cw':
+        return <ReplaceIcon {...props} />;
+      case 'bell':
+        return <BellIcon {...props} />;
+      case 'check-circle':
+        return <CheckBadgeIcon {...props} />;
+      case 'help-circle':
+        return <HelpIcon {...props} />;
+      case 'log-out':
+        return <LogoutIcon {...props} />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <TouchableOpacity
+      style={styles.row}
+      onPress={onPress}
+      disabled={type === 'switch'}
+    >
+      <View style={styles.rowIcon}>{renderIcon()}</View>
+      <Text style={[styles.rowText, { color: textColor }]}>{text}</Text>
+
+      {type === 'navigate' && <ArrowRightFilledIcon width={24} height={24} />}
+
+      {type === 'switch' && (
+        <CustomSwitch value={switchValue} onValueChange={onSwitchChange} />
+      )}
+    </TouchableOpacity>
+  );
+};
+
+export default function ProfileScreen() {
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+  const [isQrModalVisible, setQrModalVisible] = useState(false);
+  const [isTermsModalVisible, setTermsModalVisible] = useState(false);
+  const [isNotesModalVisible, setNotesModalVisible] = useState(false);
+  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [isHelpModalVisible, setHelpModalVisible] = useState(false);
+  const { logoff } = useContext(UserContext);
+
+  const navigation = useNavigation();
+
+  const formatUserName = fullName => {
+    if (!fullName) return 'Visitante';
+    const names = fullName.split(' ').slice(0, 2);
+    const formattedNames = names.map(name => {
+      if (!name) return '';
+      return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    });
+
+    return formattedNames.join(' ');
+  };
+
+  async function loadStorage() {
+    try {
+      const storageUser = await AsyncStorage.getItem('@atendeUser');
+      const formattedName = formatUserName(storageUser);
+      setUserName(formattedName);
+
+      const storageEmail = await AsyncStorage.getItem('@atendeEmail');
+      if (storageEmail) {
+        setUserEmail(storageEmail);
+      } else {
+        setUserEmail('usuario@email.com');
+        console.log('Email não encontrado no AsyncStorage');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+      setUserName('Visitante');
+      setUserEmail('usuario@email.com');
+    }
+  }
+
+  useEffect(() => {
+    loadStorage();
+  }, []);
+
+  const confirmLogout = () => {
+    logoff();
+  };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+      <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContentContainer}
+      >
+        <Text style={styles.title}>Gerencie suas informações e acessos.</Text>
+
+        <View style={styles.card}>
+          <View style={styles.profileHeader}>
+            <Image
+              style={styles.avatar}
+              source={require('../../assets/AdminPhoto.png')}
+            />
+            <Text style={styles.userName}>{userName}</Text>
+            {/* <TouchableOpacity style={styles.editButton}>
+              <Text style={styles.editButtonText}>Editar Perfil</Text>
+            </TouchableOpacity> */}
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Informações</Text>
+            <View style={styles.sectionGroup}>
+              <ProfileRow
+                iconName="shield"
+                text="Termos de Uso"
+                onPress={() => setTermsModalVisible(true)}
+              />
+              <View style={styles.separator} />
+              <ProfileRow
+                iconName="help-circle"
+                text="Ajuda"
+                onPress={() => setHelpModalVisible(true)}
+              />
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Outros</Text>
+            <ProfileRow
+              iconName="check-circle"
+              text="Notas de Atualização"
+              onPress={() => setNotesModalVisible(true)}
+            />
+            <View style={styles.separator} />
+            <ProfileRow
+              iconName="log-out"
+              text="Sair da Conta"
+              isDestructive={true}
+              onPress={() => setLogoutModalVisible(true)}
+            />
+          </View>
+        </View>
+      </ScrollView>
+      <LogoutModal
+        isVisible={isLogoutModalVisible}
+        onClose={() => setLogoutModalVisible(false)}
+        onConfirm={confirmLogout}
+      />
+      <CredentialModal
+        isVisible={isQrModalVisible}
+        onClose={() => setQrModalVisible(false)}
+      />
+      <TermsOfUseModal
+        isVisible={isTermsModalVisible}
+        onClose={() => setTermsModalVisible(false)}
+      />
+      <NotesUpdates
+        isVisible={isNotesModalVisible}
+        onClose={() => setNotesModalVisible(false)}
+      />
+      <HelpModal
+        isVisible={isHelpModalVisible}
+        onClose={() => setHelpModalVisible(false)}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffffff',
+  },
+  scrollContentContainer: {
+    paddingHorizontal: ms(20),
+    paddingBottom: ms(120),
+    paddingTop: ms(13),
+  },
+  title: {
+    fontSize: ms(20),
+    fontFamily: 'Ubuntu-Bold',
+    color: '#212121',
+    marginBottom: ms(20),
+    marginTop: ms(35),
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: ms(12),
+    padding: ms(35),
+    elevation: ms(5),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    marginTop: ms(20),
+    marginBottom: ms(50),
+  },
+  profileHeader: {
+    alignItems: 'center',
+    marginBottom: ms(20),
+  },
+  avatar: {
+    width: ms(75),
+    height: ms(75),
+    borderRadius: ms(45),
+    borderWidth: ms(3),
+    borderColor: '#00A859',
+    marginBottom: ms(12),
+  },
+  userName: {
+    fontWeight: 'normal',
+    fontSize: ms(17),
+    color: '#212121',
+    paddingBottom: 8,
+  },
+  userEmail: {
+    fontWeight: 'normal',
+    fontSize: ms(13),
+    color: '#757575',
+    marginBottom: ms(12),
+  },
+  editButton: {
+    backgroundColor: '#212121',
+    paddingVertical: ms(8),
+    paddingHorizontal: ms(15),
+    borderRadius: ms(20),
+  },
+  editButtonText: {
+    fontWeight: 'normal',
+    color: '#FFFFFF',
+    fontSize: ms(12),
+  },
+  section: {
+    marginBottom: ms(5),
+  },
+  sectionTitle: {
+    fontWeight: 'normal',
+    fontSize: ms(13),
+    color: '#757575',
+    marginBottom: ms(5),
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: ms(8),
+  },
+  rowIcon: {
+    width: ms(20),
+    alignItems: 'center',
+    marginRight: ms(18),
+  },
+  rowText: {
+    fontWeight: 'normal',
+    flex: 1,
+    fontSize: ms(13),
+  },
+  pickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  pickerText: {
+    marginRight: ms(4),
+    fontSize: ms(13),
+    fontWeight: 'normal',
+    color: '#757575',
+  },
+  separator: {
+    height: ms(1),
+    backgroundColor: '#F0F0F0',
+    marginLeft: -2,
+  },
+});
