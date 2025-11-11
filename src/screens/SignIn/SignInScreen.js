@@ -12,11 +12,12 @@ import {
   Keyboard,
   Text,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { UserContext } from '../../contexts/UserContext';
 import { useNavigation } from '@react-navigation/native';
 
-import LogoSenar2 from '../../assets/LogoSenar2.svg';
+import LogoColab from '../../assets/LogoColab.svg';
 import NomeSenar from '../../assets/NameApp.svg';
 import Famato from '../../assets/Famato.svg';
 import { ms } from 'react-native-size-matters';
@@ -113,7 +114,7 @@ export default function SignInScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={['#50D18D', '#00A859']} style={styles.container}>
       <Animated.View
         style={[
           styles.containerLogo,
@@ -121,15 +122,13 @@ export default function SignInScreen() {
         ]}
       >
         <Animated.View style={{ transform: [{ translateX: logoX }] }}>
-          <LogoSenar2 width={106} height={99} />
+          <LogoColab width={170} height={100} />
         </Animated.View>
         <Animated.View
           style={{
             transform: [{ translateX: nomeX }, { translateY: nomeY }],
           }}
-        >
-          <NomeSenar width={105} height={55} />
-        </Animated.View>
+        ></Animated.View>
       </Animated.View>
 
       <Animated.View
@@ -197,6 +196,12 @@ export default function SignInScreen() {
 
             <View style={styles.footer}>
               <TouchableOpacity style={styles.button} onPress={handleSignClick}>
+                <LinearGradient
+                  colors={['#50D18D', '#00A859']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={StyleSheet.absoluteFill}
+                />
                 {loadingAuth ? (
                   <ActivityIndicator size={20} color="#FFF" />
                 ) : (
@@ -208,13 +213,12 @@ export default function SignInScreen() {
           </KeyboardAwareScrollView>
         </TouchableWithoutFeedback>
       </Animated.View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#00A859',
     flex: 1,
     justifyContent: 'flex-end',
   },
@@ -241,7 +245,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    fontWeight: 'normal',
+    fontFamily: 'Ubuntu-Medium',
     fontSize: ms(14),
     color: '#333',
     marginBottom: ms(5),
@@ -259,7 +263,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffffff9',
   },
   input: {
-    fontWeight: 'normal',
+    fontFamily: 'Ubuntu-Regular',
     flex: 1,
     height: ms(45),
     fontSize: ms(14),
@@ -276,18 +280,18 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     color: '#333',
-    fontWeight: 'normal',
+    fontFamily: 'Ubuntu-Regular',
     fontSize: ms(14),
     marginTop: ms(10),
   },
   title: {
-    fontWeight: 'normal',
+    fontFamily: 'Ubuntu-Bold',
     fontSize: ms(18),
     marginBottom: ms(5),
     textAlign: 'center',
   },
   text: {
-    fontWeight: 'normal',
+    fontFamily: 'Ubuntu-Regular',
     fontSize: ms(14),
     marginBottom: ms(40),
     color: '#3d3d3dff',
@@ -299,16 +303,16 @@ const styles = StyleSheet.create({
     paddingTop: ms(40),
   },
   button: {
-    backgroundColor: '#00A859',
     borderRadius: ms(10),
     paddingVertical: ms(12),
     width: '60%',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: ms(40),
+    overflow: 'hidden',
   },
   buttonText: {
-    fontWeight: 'normal',
+    fontFamily: 'Ubuntu-Medium',
     color: '#FFF',
     fontSize: ms(15),
   },

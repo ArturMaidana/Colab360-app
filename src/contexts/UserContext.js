@@ -14,7 +14,6 @@ export default ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Define a função loadStorage fora do useEffect para que possa ser chamada de qualquer lugar dentro do componente
   async function loadStorage() {
     try {
       const storageUser = await AsyncStorage.getItem('@atendeToken');

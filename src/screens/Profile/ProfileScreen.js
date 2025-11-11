@@ -175,6 +175,23 @@ export default function ProfileScreen() {
           </View>
 
           <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Preferências</Text>
+            <View style={styles.sectionGroup}>
+              <ProfileRow
+                iconName="shield"
+                text="Trocar de Casa"
+                onPress={() => setTermsModalVisible(true)}
+              />
+              <View style={styles.separator} />
+              <ProfileRow
+                iconName="help-circle"
+                text="Notificações"
+                onPress={() => setHelpModalVisible(true)}
+              />
+            </View>
+          </View>
+
+          <View style={styles.section}>
             <Text style={styles.sectionTitle}>Outros</Text>
             <ProfileRow
               iconName="check-circle"
@@ -227,10 +244,10 @@ const styles = StyleSheet.create({
     paddingTop: ms(13),
   },
   title: {
-    fontSize: ms(20),
-    fontFamily: 'Ubuntu-Bold',
+    fontSize: ms(19),
+    fontFamily: 'Ubuntu-Medium',
     color: '#212121',
-    marginBottom: ms(20),
+    marginBottom: ms(10),
     marginTop: ms(35),
   },
   card: {

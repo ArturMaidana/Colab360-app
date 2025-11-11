@@ -1,11 +1,19 @@
 import React from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient'; // 1. Importar
 
-import { HomeIcon, DashboardIcon, ProfileIcon } from '../Icons/Icons';
+import {
+  HomeIcon,
+  DashboardIcon,
+  ProfileIcon,
+  Megaphone,
+  MegaphoneIcon,
+  Chat,
+} from '../Icons/Icons';
 
 const iconConfig = {
   Home: HomeIcon,
-  AttedanceToday: DashboardIcon,
+  AttedanceToday: Chat,
   Profile: ProfileIcon,
 };
 
@@ -16,7 +24,13 @@ export default ({ state, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.tabBar}>
+      {/* 2. Trocar <View> por <LinearGradient> */}
+      <LinearGradient
+        colors={['#42C078', '#229F7C']} // Cores do gradiente
+        start={{ x: 0, y: 0 }} // Gradiente horizontal
+        end={{ x: 1, y: 0 }}
+        style={styles.tabBar} // Aplicar o mesmo estilo
+      >
         {state.routes.map((route, index) => {
           const isFocused = state.index === index;
           const IconComponent = iconConfig[route.name];
@@ -44,7 +58,8 @@ export default ({ state, navigation }) => {
             </Pressable>
           );
         })}
-      </View>
+      </LinearGradient>
+      {/* 2. Fim da troca */}
     </View>
   );
 };
@@ -52,24 +67,23 @@ export default ({ state, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 25,
+    bottom: 35,
     left: 20,
     right: 20,
     alignItems: 'center',
   },
   tabBar: {
     flexDirection: 'row',
-    height: 75,
-    width: '75%',
-    backgroundColor: '#00A859',
-    borderRadius: 43,
+    height: 70,
+    width: '70%',
+    borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'space-around',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.5,
     shadowRadius: 4.65,
-    elevation: 8,
+    elevation: 4,
   },
   tabItem: {
     flex: 1,
@@ -86,8 +100,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   activeIconContainer: {
-    width: 55,
-    height: 55,
+    width: 50,
+    height: 50,
     borderRadius: 50,
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',

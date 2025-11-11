@@ -1,188 +1,203 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ScrollView, StyleSheet, View, ActivityIndicator } from 'react-native';
-import CardEvent from '../../components/ui/CardEvent';
-import CardNotEvent from '../../components/ui/CardNotEvent';
-import GlobalSearchBar from '../../components/ui/GlobalSearch';
-import MonthCarousel from '../../components/ui/MonthCarousel';
-import Header from '../../components/ui/Header';
-import { dataAtual } from '../../utils/date';
-import api from './../../services/endpont';
+import React, { useState, useRef } from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+  Easing,
+} from 'react-native';
 
-const Container = ({ children }) => (
-  <View style={styles.container}>{children}</View>
-);
+import Header from '../../components/ui/Header';
+import {
+  Microchip,
+  UsersThree,
+  DocumentAddOutline,
+  DocumentScanner,
+  ArrowRightIcon,
+  LocationPin3,
+  Graphcs,
+  CommentOutlined,
+  PlantFill,
+  LikeFilled,
+  LikeOutlined,
+} from '../../components/Icons/Icons';
+import QuickAccessCard from '../../components/ui/QuickAcessCard';
+import PublicationCard from '../../components/ui/PublicationCard';
 
 export default function Home({ navigation }) {
-  const dateNow = dataAtual();
-  const [monthlyEventCounts, setMonthlyEventCounts] = useState({});
-  const [isMonthLoading, setIsMonthLoading] = useState(true);
-  const [selectedMonth, setSelectedMonth] = useState(null);
-  const [educationalEvents, setEducationalEvents] = useState([]);
+  const [showFirstPage, setShowFirstPage] = useState(true);
 
-  const [globalSearchText, setGlobalSearchText] = useState('');
-  const [globalResults, setGlobalResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const rotation = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
 
-  const scrollRef = useRef(null);
+  const handlePressCard = () => {
+    console.log('Post clicado!');
+    // navigation.navigate('DetalhesDoPost'); // Exemplo de navegação
+  };
 
-  useEffect(() => {
-    function loadMonthlyCounts() {
-      const EventsCount = {};
+  const handlePressLike = () => {
+    console.log('Like clicado!');
+  };
 
-      for (let i = 0; i < 12; i++) {
-        EventsCount[i] = Math.floor(Math.random() * (20 - 3 + 1)) + 3;
-      }
+  const handlePressComment = () => {
+    console.log('Comentário clicado!');
+  };
 
-      console.log(' MONTH COUNTS:', EventsCount);
-      setMonthlyEventCounts(EventsCount);
-    }
+  const handleToggle = () => {
+    // Gira a seta com leve elasticidade
+    Animated.timing(rotation, {
+      toValue: showFirstPage ? 1 : 0,
+      duration: 300,
+      easing: Easing.elastic(1.2),
+      useNativeDriver: true,
+    }).start();
 
-    loadMonthlyCounts();
-  }, []);
+    // Troca o conteúdo instantaneamente
+    setShowFirstPage(!showFirstPage);
 
-  function updatedMonth(index) {
-    setSelectedMonth(index);
-    setEducationalEvents([]);
-    setIsMonthLoading(true);
+    // Executa o "bump" elástico rápido pro lado
+    Animated.sequence([
+      Animated.spring(slideAnim, {
+        toValue: showFirstPage ? -25 : 25, // puxa rápido pro lado
+        speed: 30,
+        bounciness: 8,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0, // volta pro centro
+        speed: 20,
+        bounciness: 6,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
-    const year = new Date().getFullYear();
-    const firstDayOfMonth = new Date(year, index, 1);
-
-    const formattedDate = `${firstDayOfMonth.getFullYear()}-${String(
-      firstDayOfMonth.getMonth() + 1,
-    ).padStart(2, '0')}-01`;
-
-    getEvents(formattedDate);
-  }
-
-  async function getEvents(date) {
-    try {
-      const educationalEvents = await api.getEventsAtendeDate(date);
-      setEducationalEvents(educationalEvents.data);
-    } catch (error) {
-      console.error('Erro ao buscar eventos:', error);
-      setEducationalEvents([]); // Garante que a lista fique vazia em caso de erro
-    } finally {
-      setIsMonthLoading(false); // 👈 4. DESATIVE O LOADING AQUI
-    }
-  }
-
-  useEffect(() => {
-    const currentMonthIndex = new Date().getMonth();
-    setSelectedMonth(currentMonthIndex);
-    getEvents(dateNow);
-    setTimeout(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTo({
-          x: currentMonthIndex * 60 - 120,
-          animated: true,
-        });
-      }
-    }, 100);
-  }, []);
+  const rotateInterpolate = rotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '180deg'],
+  });
 
   return (
-    <Container>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+    >
       <Header />
-      <GlobalSearchBar navigation={navigation} />
 
-      <MonthCarousel
-        displayMonthIndex={selectedMonth}
-        onMonthChange={updatedMonth}
-        monthlyEventCounts={monthlyEventCounts}
-      />
+      <Text style={styles.sectionTitle}>Acesso Rápido</Text>
 
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        {/* 👇 5. SUBSTITUA O TERNÁRIO ANTIGO POR ESTA LÓGICA */}
-        {isMonthLoading ? (
-          <ActivityIndicator
-            size="large"
-            color="#07814f"
-            style={styles.loadingIndicator}
-          />
-        ) : educationalEvents.length > 0 ? (
-          educationalEvents.map(event => (
-            <CardEvent
-              key={event.id}
-              eventId={event.id}
-              title={event.name}
-              dateEvent={event.started_at}
-              location={event.city}
-              date={event.started_at}
-              status={event.status}
+      <View style={styles.rowContainer}>
+        <QuickAccessCard
+          title="Processos"
+          subtitle="Visualize seus processos"
+          onPress={() => navigation.navigate('Processos')}
+          icon={<Microchip color="#229F7C" size={32} />}
+          isFocused={true}
+        />
+        <QuickAccessCard
+          title="Colaborativo"
+          subtitle="Atividades em conjunto"
+          onPress={() => navigation.navigate('Colaborativo')}
+          icon={<UsersThree color="#229F7C" size={32} />}
+        />
+      </View>
+
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Processos (15)</Text>
+        <TouchableOpacity onPress={handleToggle}>
+          <Animated.View
+            style={{
+              transform: [{ rotate: rotateInterpolate }],
+            }}
+          >
+            <ArrowRightIcon color="#333" size={24} />
+          </Animated.View>
+        </TouchableOpacity>
+      </View>
+
+      <Animated.View
+        style={{
+          transform: [{ translateX: slideAnim }],
+        }}
+      >
+        {showFirstPage ? (
+          <View style={styles.rowContainer}>
+            <QuickAccessCard
+              title="Assinaturas"
+              subtitle="Envelopes de Assinaturas"
+              onPress={() => navigation.navigate('Assinaturas')}
+              icon={<DocumentAddOutline color="#229F7C" size={32} />}
             />
-          ))
+            <QuickAccessCard
+              title="Protocolo Eletrônico"
+              subtitle="Consulte seus protocolos"
+              onPress={() => navigation.navigate('Protocolo')}
+              icon={<DocumentScanner color="#229F7C" size={32} />}
+            />
+          </View>
         ) : (
-          <CardNotEvent />
+          <View style={styles.rowContainer}>
+            <QuickAccessCard
+              title="Gestão Atividades"
+              subtitle="Gerencie suas atividades"
+              onPress={() => navigation.navigate('Notas')}
+              icon={<Graphcs color="#229F7C" size={32} />}
+            />
+            <QuickAccessCard
+              title="Transporte"
+              subtitle="Solicitação de transporte"
+              onPress={() => navigation.navigate('Alertas')}
+              icon={<LocationPin3 size={32} color="#229F7C" />}
+            />
+          </View>
         )}
-      </ScrollView>
-    </Container>
+      </Animated.View>
+
+      <Text style={styles.sectionTitle}>Colaborativo</Text>
+      <PublicationCard
+        author="Sistema Famato"
+        timeAgo="há 1 mês atrás"
+        description="Com foco na qualidade, a Equipe de Pedagógica realizou duas pilotagens do treinamento:"
+        imageUri="https://via.placeholder.com/600x400/00A859/FFFFFF?text=Producao+Artesanal+de+Queijos+Finos" // Substitua pela URL da sua imagem
+        imageTag="Pilotagens"
+        imageTitle="Produção Artesanal de Queijos Finos"
+        imageSubtitle="Chapada dos Guimarães e Colniza"
+        likesCount={1.894}
+        commentsCount={230}
+        onPressCard={handlePressCard}
+        onPressLike={handlePressLike}
+        onPressComment={handlePressComment}
+      />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffffff',
+    backgroundColor: '#fff',
   },
-  monthSelector: {
-    flexDirection: 'row',
-    paddingVertical: 10,
-    backgroundColor: '#ffffffff',
-    maxHeight: 80,
-  },
-  loadingIndicator: {
-    marginTop: 50, // Adiciona um espaço no topo
-  },
-  monthButton: {
-    marginRight: 10,
-    padding: 10,
-    borderRadius: 50,
-    height: 60,
-    width: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  monthButtonActive: {
-    backgroundColor: '#07814f',
-  },
-  monthButtonInactive: {
-    backgroundColor: '#ffffffff',
-  },
-  monthText: {
-    fontSize: 16,
-  },
-  monthTextActive: {
-    color: '#ffffff',
-  },
-  monthTextInactive: {
-    color: '#000',
-  },
-  eventosText: {
-    color: '#454652',
-    fontSize: 13,
-    fontStyle: 'normal',
-    fontWeight: '700',
-    lineHeight: 24,
-  },
-  programadosText: {
-    color: '#7C7A80',
-    fontSize: 10,
-    fontStyle: 'normal',
-    fontWeight: '400',
-    lineHeight: 24,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 15,
-    padding: 10,
-  },
-  spacer: {
-    width: 5,
-  },
-  scrollViewContent: {
-    padding: 16,
+  scrollContent: {
+    paddingHorizontal: 20,
     paddingBottom: 120,
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 5,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontFamily: 'Ubuntu-Medium',
+    color: '#333',
+    marginBottom: 5,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });

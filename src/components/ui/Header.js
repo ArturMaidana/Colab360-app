@@ -29,7 +29,7 @@ export default function Header() {
       setUserName(formattedName);
 
       setUserAvatar(require('../../assets/AdminPhoto.png'));
-      setLocation('Cuiabá, Mato Grosso');
+      setLocation('Terça-feira - 11 de Novembro 2025, Cuiabá');
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
       setUserName('Visitante');
@@ -60,7 +60,6 @@ export default function Header() {
 const styles = StyleSheet.create({
   staticHeader: {
     paddingTop: 45,
-    paddingHorizontal: 10,
     backgroundColor: '#ffffff',
   },
   header: {
@@ -72,22 +71,22 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#E0E0EE',
     borderWidth: 2,
     borderColor: '#00A859',
   },
   userInfo: {
     flex: 1,
-    marginLeft: 15,
+    marginLeft: 8,
   },
   welcomeText: {
-    fontWeight: 'bold',
+    fontFamily: 'Ubuntu-Bold',
     fontSize: 16,
     color: '#212121',
   },
   locationText: {
-    fontWeight: 'light',
+    fontFamily: 'Ubuntu-Light',
     fontSize: 13,
+    marginTop: 2,
     color: '#757575',
   },
   notificationButton: {
