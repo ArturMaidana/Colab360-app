@@ -58,15 +58,10 @@ export default function PublicationCard({
       <Text style={styles.descriptionText}>{description}</Text>
 
       <View style={styles.imageWrapper}>
-        <Image source={{ uri: imageUri }} style={styles.postImage} />
-        <View style={styles.imageOverlay}>
-          {imageTag && <Text style={styles.imageTag}>{imageTag}</Text>}
-          <Text style={styles.imageTitle}>{imageTitle}</Text>
-          <View style={styles.imageSubtitleContainer}>
-            <PinIcon color="#FFF" size={ms(12)} />
-            <Text style={styles.imageSubtitle}>{imageSubtitle}</Text>
-          </View>
-        </View>
+        <Image
+          source={typeof imageUri === 'string' ? { uri: imageUri } : imageUri}
+          style={styles.postImage}
+        />
       </View>
 
       <View style={styles.footer}>
@@ -87,7 +82,7 @@ const styles = StyleSheet.create({
   cardContainer: {
     backgroundColor: '#FFFFFF',
     borderRadius: ms(12),
-    marginTop: ms(10), // Margem superior
+    // Margem superior
     paddingVertical: ms(5),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -107,19 +102,19 @@ const styles = StyleSheet.create({
   },
   authorText: {
     fontFamily: 'Ubuntu-Bold', // Use a fonte que você linkou
-    fontSize: ms(14),
+    fontSize: ms(13),
     marginLeft: 10,
     color: '#333333',
   },
   timeAgoText: {
     fontFamily: 'Ubuntu-Regular', // Use a fonte que você linkou
-    fontSize: ms(12),
+    fontSize: ms(11),
     marginLeft: 10,
     color: '#666666',
   },
   descriptionText: {
     fontFamily: 'Ubuntu-Regular',
-    fontSize: ms(14),
+    fontSize: ms(12),
     color: '#333333',
     paddingHorizontal: ms(15),
     marginBottom: ms(10),
@@ -127,7 +122,7 @@ const styles = StyleSheet.create({
   },
   imageWrapper: {
     width: '100%', // Preenche a largura do card
-    height: ms(200), // Altura fixa da imagem
+    height: ms(180), // Altura fixa da imagem
     borderRadius: ms(12),
     overflow: 'hidden', // Importante para o borderRadius funcionar na imagem
     marginBottom: ms(10),
@@ -174,9 +169,8 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     paddingHorizontal: ms(15),
-    borderTopWidth: StyleSheet.hairlineWidth, // Linha fina
-    borderTopColor: '#EEEEEE',
-    paddingTop: ms(5),
+    borderTopColor: '#ffffffff',
+    marginBottom: 10,
   },
   footerAction: {
     flexDirection: 'row',

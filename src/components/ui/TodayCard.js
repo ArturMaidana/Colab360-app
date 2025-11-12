@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tagContainer: {
-    backgroundColor: '#00A859',
+    backgroundColor: '#00A1FF',
     borderRadius: ms(8),
     paddingVertical: ms(4),
     paddingHorizontal: ms(10),
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontFamily: 'Ubuntu-Medium',
-    color: '#005ca8ff',
+    color: '#333',
     fontSize: ms(12),
     marginRight: ms(4),
   },
